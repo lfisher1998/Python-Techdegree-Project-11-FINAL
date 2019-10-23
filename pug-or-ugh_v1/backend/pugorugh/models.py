@@ -3,8 +3,6 @@ from django.db import IntegrityError
 
 from django.contrib.auth.models import User
 
-from multiselectfield import MultiSelectField
-
 
 DOG_AGES = {
     'b': range(0, 7),
