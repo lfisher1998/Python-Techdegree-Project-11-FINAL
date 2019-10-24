@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import permissions
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (CreateAPIView, ListAPIView,
                                      ListCreateAPIView, RetrieveAPIView,
@@ -13,12 +14,19 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status as api_status
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from django.db.models import Q
 from django.contrib.auth.models import User
 
 from . import models
 from . import serializers
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'dogs': reverse('ListDogs', request=request, format=format)
+    })
 
 class UserRegisterView(CreateAPIView):
     permission_classes = (permissions.AllowAny,)
@@ -27,7 +35,7 @@ class UserRegisterView(CreateAPIView):
 
 #/api/dog/<pk>/<status>/    
 class UpdateStatus(APIView):
-    """ This view updates a dog's status to liked or disliked. """    
+    """ This view updates a dog's status to liked or disliked. """ 
     
     def put(self, request, pk, status, format=None):
         status_choice = None
@@ -96,9 +104,9 @@ class NextDogView(RetrieveAPIView):
             available_dogs = self.queryset
 
         return available_dogs.filter(
-            Q(userdog__status=self.given_status) &
-            Q(userdog__user__id=self.request.user.id) &
-            Q(id__gt=self.kwargs.get('pk'))
+            userdog__status=self.given_status,
+            userdog__user__id=self.request.user.id, 
+            id__gt=self.kwargs.get('pk')
         )
     
     def get_object(self):
@@ -175,7 +183,7 @@ class ListDogsStatusView(ListAPIView):
         )
 
 #/api/user/preferences/    
-class CreateUpdateViewUserPref(RetrieveUpdateAPIView):
+class CreateUpdateViewUserPref(RetrieveUpdateAPIView, CreateModelMixin):
     """Create, update, or view user preferences."""
 
     authentication_classes = (TokenAuthentication,)
@@ -186,9 +194,15 @@ class CreateUpdateViewUserPref(RetrieveUpdateAPIView):
 
     lookup_field = None
 
+    
     def get_object(self):
-        return get_object_or_404(
-            self.get_queryset(),
-            user=self.request.user
-        )
+        try:
+            user_pref = models.UserPref.objects.get(user=self.request.user.id)
+        except models.UserPref.DoesNotExist:
+            user_pref = models.UserPref.objects.create(user=self.request.user)
+            
+        return user_pref
+        
+    
+    
         
