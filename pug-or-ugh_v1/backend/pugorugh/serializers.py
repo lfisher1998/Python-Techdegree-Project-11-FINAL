@@ -22,22 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class DogSerializer(serializers.ModelSerializer):
     
-    def create(self, validated_data):
-        dog = models.Dog.objects.create(
-            name=validated_data['name'],
-            age=validated_data['age'],
-            gender=validated_data['gender'],
-            image_filename=validated_data['image_filename'],
-            size=validated_data['size'],
-        )
-        return dog
-        try:
-            dog = models.Dog.objects.filter(
-                name=validated_data['name']).update(
-                breed=validated_data['breed'],
-            )
-        except KeyError:
-            pass
+    
         
     
     class Meta:
@@ -48,6 +33,8 @@ class DogSerializer(serializers.ModelSerializer):
         
         
 class UserDogSerializer(serializers.ModelSerializer):
+    queryset = models.UserDog.objects.all()
+            
 
     class Meta:
         model = models.UserDog

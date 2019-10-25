@@ -3,7 +3,6 @@ from django.db import IntegrityError
 
 from django.contrib.auth.models import User
 
-from multiselectfield import MultiSelectField
 
 
 DOG_AGES = {
@@ -83,7 +82,8 @@ class UserDog(models.Model):
     status = models.CharField(
         max_length=1,
         choices = STATUS_CHOICES,
-        null=True,
+        null = True,
+        
     )
     
     def save(self, *args, **kwargs):
@@ -95,7 +95,7 @@ class UserDog(models.Model):
         super(UserDog, self).save(*args, **kwargs)
         
     def __str__(self):
-        return self.user.username
+        return self.user.username + "" + self.dog.name
     
 class UserPref(models.Model):
     """ This model includes user preferences """
