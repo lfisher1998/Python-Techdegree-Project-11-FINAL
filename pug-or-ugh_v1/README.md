@@ -1,7 +1,4 @@
-USER 1: KingFish
-username: KingFish
-password: Nerffreak12
-token: b770d9e0f94a89b647ba280de9c412298613a56b
+
 
 
 # Pug or Ugh
